@@ -1,0 +1,33 @@
+{
+  "info": {
+    "name": "MKP — Login dan Jadwal Tayang",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {"type":"bearer","bearer":[{"key":"token","value":"{{token}}","type":"string"}]},
+  "variable": [
+    {"key":"base_url","value":"http://127.0.0.1:8081"},
+    {"key":"token","value":""},
+    {"key":"id_jadwal","value":""},
+    {"key":"id_studio","value":"1"},
+    {"key":"id_film","value":"1"}
+  ],
+  "item": [
+    {
+      "name":"1. Login",
+      "request":{"auth":{"type":"noauth"},"method":"POST","url":"{{base_url}}/login","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"email\": \"demo@example.com\",\n  \"password\": \"mkp-demo-password\"\n}"}},
+      "event":[{"listen":"test","script":{"type":"text/javascript","exec":["pm.test('Login berhasil', () => pm.response.to.have.status(200));", "if (pm.response.code === 200) pm.collectionVariables.set('token', pm.response.json().access_token);"]}}]
+    },
+    {
+      "name":"2. Buat jadwal",
+      "request":{"method":"POST","url":"{{base_url}}/jadwal-tayang","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"id_studio\": {{id_studio}},\n  \"id_film\": {{id_film}},\n  \"mulai_at\": \"2026-12-01T14:00:00+07:00\",\n  \"selesai_at\": \"2026-12-01T16:00:00+07:00\",\n  \"harga\": 50000\n}"}},
+      "event":[{"listen":"test","script":{"type":"text/javascript","exec":["pm.test('Jadwal dibuat', () => pm.response.to.have.status(201));", "if (pm.response.code === 201) pm.collectionVariables.set('id_jadwal', pm.response.json().id_jadwal);"]}}]
+    },
+    {"name":"3. Daftar jadwal","request":{"method":"GET","url":"{{base_url}}/jadwal-tayang?page=1&limit=20"}},
+    {"name":"4. Detail jadwal","request":{"method":"GET","url":"{{base_url}}/jadwal-tayang/{{id_jadwal}}"}},
+    {
+      "name":"5. Ubah jadwal",
+      "request":{"method":"PUT","url":"{{base_url}}/jadwal-tayang/{{id_jadwal}}","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"id_studio\": {{id_studio}},\n  \"id_film\": {{id_film}},\n  \"mulai_at\": \"2026-12-01T14:00:00+07:00\",\n  \"selesai_at\": \"2026-12-01T16:00:00+07:00\",\n  \"harga\": 60000,\n  \"status\": \"aktif\"\n}"}}
+    },
+    {"name":"6. Hapus jadwal","request":{"method":"DELETE","url":"{{base_url}}/jadwal-tayang/{{id_jadwal}}"}}
+  ]
+}
